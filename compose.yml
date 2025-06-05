@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: dotnet_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/data  # SQLite DB file will live here
+
