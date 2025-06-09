@@ -16,6 +16,8 @@ public class TaskItemContext : DbContext
             entity.ToTable("TaskItems");
 
             entity.HasKey(t => t.Id);
+            entity.Property(t => t.Id)
+                .ValueGeneratedOnAdd();
 
             entity.Property(t => t.Title)
                 .IsRequired()
@@ -25,19 +27,19 @@ public class TaskItemContext : DbContext
                 .HasMaxLength(1000);
 
             entity.Property(t => t.IsCompleted)
-                .IsRequired();
+                .HasDefaultValue(false);
 
             entity.Property(t => t.CreatedAt)
-                .IsRequired();
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.Property(t => t.DueAt)
                 .IsRequired(false);
 
-            entity.Property(t => t.EstimatedPomodoros)
-                .IsRequired();
+            entity.Property(t => t.EstimatedPomodoros);
 
             entity.Property(t => t.CompletedPomodoros)
-                .IsRequired();
+                .HasDefaultValue(0);
         });
     }
 }

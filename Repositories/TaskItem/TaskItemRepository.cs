@@ -19,16 +19,18 @@ public class TaskItemRepository : ITaskItemRepository
         return await _context.TaskItems.FindAsync(id);
     }
 
-    public async Task AddAsync(TaskItem task)
+    public async Task<TaskItem> AddAsync(TaskItem task)
     {
         await _context.TaskItems.AddAsync(task);
         await _context.SaveChangesAsync();
+        return task;
     }
 
-    public async Task UpdateAsync(TaskItem task)
+    public async Task<TaskItem> UpdateAsync(TaskItem task)
     {
         _context.TaskItems.Update(task);
         await _context.SaveChangesAsync();
+        return task;
     }
 
     public async Task DeleteAsync(int id)

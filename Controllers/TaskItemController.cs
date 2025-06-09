@@ -4,17 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/[controller]")]
 public class TaskItemController : ControllerBase
 {
-    private readonly ITaskItemRepository _repository;
+    private readonly ITaskItemService _service;
 
-    public TaskItemController(ITaskItemRepository repository)
+    public TaskItemController(ITaskItemService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var taskItems = _repository.GetAllAsync().Result;
+        var taskItems = await _service.GetAllAsync();
         if (taskItems == null || !taskItems.Any())
         {
             return NotFound();
@@ -23,9 +23,9 @@ public class TaskItemController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var taskItem = _repository.GetByIdAsync(id).Result;
+        var taskItem = await _service.GetByIdAsync(id);
         if (taskItem == null)
         {
             return NotFound();
@@ -33,46 +33,49 @@ public class TaskItemController : ControllerBase
         return Ok(taskItem);
     }
 
-    [HttpPost]
-    public IActionResult Create([FromBody] TaskItem taskItem)
-    {
-        if (taskItem == null)
-        {
-            return BadRequest("Task item cannot be null.");
-        }
 
-        _repository.AddAsync(taskItem).Wait();
-        return CreatedAtAction(nameof(GetById), new { id = taskItem.Id }, taskItem);
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] TaskItemDTO taskDTO)
+    {
+        if (taskDTO == null)
+            return BadRequest("Task item cannot be null.");
+
+        var createdTask = await _service.AddAsync(taskDTO);
+        return CreatedAtAction(nameof(GetById), new { id = createdTask.Id }, createdTask);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, [FromBody] TaskItem taskItem)
+    public async Task<IActionResult> Update(int id, [FromBody] TaskItemDTO taskDTO)
     {
-        if (taskItem == null || taskItem.Id != id)
+        if (taskDTO == null)
         {
             return BadRequest("Task item is invalid.");
         }
 
-        var existingTaskItem = _repository.GetByIdAsync(id).Result;
-        if (existingTaskItem == null)
+        try
+        {
+            await _service.UpdateAsync(taskDTO, id);
+        }
+        catch (KeyNotFoundException)
         {
             return NotFound();
         }
 
-        _repository.UpdateAsync(taskItem).Wait();
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var existingTaskItem = _repository.GetByIdAsync(id).Result;
-        if (existingTaskItem == null)
+        try
+        {
+            await _service.DeleteAsync(id);
+        }
+        catch (KeyNotFoundException)
         {
             return NotFound();
         }
 
-        _repository.DeleteAsync(id).Wait();
         return NoContent();
     }
 }

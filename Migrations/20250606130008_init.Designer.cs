@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Pomodoro.API.Migrations
 {
     [DbContext(typeof(TaskItemContext))]
-    [Migration("20250604204942_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250606130008_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,9 @@ namespace Pomodoro.API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CompletedPomodoros")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
@@ -42,7 +44,9 @@ namespace Pomodoro.API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCompleted")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Title")
                         .IsRequired()

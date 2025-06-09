@@ -13,6 +13,8 @@ builder.Services.AddDbContext<TaskItemContext>(options =>
 
 builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 
+builder.Services.AddScoped<ITaskItemService, TaskItemService>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
