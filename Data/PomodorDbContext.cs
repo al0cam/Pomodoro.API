@@ -1,16 +1,25 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-public class TaskItemContext : DbContext
+public class PomodorDbContext : IdentityDbContext<ApplicationUser> // Change to ApplicationUser
 {
     public required DbSet<TaskItem> TaskItems { get; set; }
 
-    public TaskItemContext(DbContextOptions<TaskItemContext> options)
+    public PomodorDbContext(DbContextOptions<PomodorDbContext> options)
         : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.TaskItems)
+            .WithOne(t => t.User)
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<TaskItem>(entity =>
         {
             entity.ToTable("TaskItems");
@@ -43,4 +52,3 @@ public class TaskItemContext : DbContext
         });
     }
 }
-

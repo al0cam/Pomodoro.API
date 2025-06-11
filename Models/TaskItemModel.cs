@@ -8,5 +8,8 @@ public class TaskItem
     public DateTime? DueAt { get; set; }
     public int? EstimatedPomodoros { get; set; }
     public int? CompletedPomodoros { get; set; }
+
+    public string UserId { get; set; }
+    public ApplicationUser User { get; set; } = null!;
 }
 

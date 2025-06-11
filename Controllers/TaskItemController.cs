@@ -1,81 +1,74 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TaskItemController : ControllerBase
+[Authorize] // Ensures only authenticated users can access these endpoints
+public class TaskItemsController : ControllerBase
 {
-    private readonly ITaskItemService _service;
+    private readonly ITaskItemService _taskItemService;
 
-    public TaskItemController(ITaskItemService service)
+    public TaskItemsController(ITaskItemService taskItemService)
     {
-        _service = service;
+        _taskItemService = taskItemService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<TaskItem>>> GetAllTasks()
     {
-        var taskItems = await _service.GetAllAsync();
-        if (taskItems == null || !taskItems.Any())
-        {
-            return NotFound();
-        }
-        return Ok(taskItems);
+        // Pass the current user to the service
+        var tasks = await _taskItemService.GetAllAsync(User);
+        return Ok(tasks);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<ActionResult<TaskItem>> GetTaskById(int id)
     {
-        var taskItem = await _service.GetByIdAsync(id);
-        if (taskItem == null)
+        // Pass the current user to the service
+        var task = await _taskItemService.GetByIdAsync(id, User);
+        if (task == null)
         {
+            // This could mean not found or not authorized
             return NotFound();
         }
-        return Ok(taskItem);
+        return Ok(task);
     }
 
-
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] TaskItemDTO taskDTO)
+    public async Task<ActionResult<TaskItem>> AddTask(TaskItemDTO taskDTO)
     {
-        if (taskDTO == null)
-            return BadRequest("Task item cannot be null.");
-
-        var createdTask = await _service.AddAsync(taskDTO);
-        return CreatedAtAction(nameof(GetById), new { id = createdTask.Id }, createdTask);
+        // Pass the current user to the service
+        var addedTask = await _taskItemService.AddAsync(taskDTO, User);
+        return CreatedAtAction(nameof(GetTaskById), new { id = addedTask.Id }, addedTask);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] TaskItemDTO taskDTO)
+    public async Task<ActionResult<TaskItem>> UpdateTask(int id, TaskItemDTO taskDTO)
     {
-        if (taskDTO == null)
-        {
-            return BadRequest("Task item is invalid.");
-        }
-
         try
         {
-            await _service.UpdateAsync(taskDTO, id);
+            // Pass the current user to the service
+            var updatedTask = await _taskItemService.UpdateAsync(taskDTO, id, User);
+            return Ok(updatedTask);
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            return NotFound();
+            return NotFound(ex.Message);
         }
-
-        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteTask(int id)
     {
         try
         {
-            await _service.DeleteAsync(id);
+            // Pass the current user to the service
+            await _taskItemService.DeleteAsync(id, User);
+            return NoContent();
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            return NotFound();
+            return NotFound(ex.Message);
         }
-
-        return NoContent();
     }
 }
