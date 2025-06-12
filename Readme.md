@@ -1,180 +1,147 @@
-# Pomodoro.API
+# Pomodoro API - Backend for Task Management & Focus Timer
 
-[![.NET](https://github.com/al0cam/Pomodoro.API/actions/workflows/dotnet.yml/badge.svg)](https://github.com/al0cam/Pomodoro.API/actions/workflows/dotnet.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+This repository contains the backend API for the Pomodoro application, designed to manage user authentication and task-related data. Built with .NET Core, it provides the necessary endpoints for the Pomodoro UI frontend to persist and retrieve user-specific information and tasks.
 
-## 📝 Description
+## Features
 
-This repository contains the backend API for a Pomodoro Technique management application. Built with ASP.NET Core, it provides a robust RESTful interface for managing `TaskItem` entities, which represent individual tasks to be completed using the Pomodoro method.
+### User Authentication
+- Secure user registration.
+- User login with JSON Web Token (JWT) generation for secure access.
 
-The API supports standard CRUD (Create, Read, Update, Delete) operations for task items, allowing clients to efficiently manage their Pomodoro sessions and track task progress.
+### Task Management
+- Create, read, update, and delete (CRUD) task items.
+- Tasks are associated with specific users, ensuring data privacy and personalization.
+- Persistence of task details including title, description, completion status, estimated, and completed Pomodoro counts.
 
-## ✨ Features
+## Technologies Used
 
-* **TaskItem Management:** Comprehensive CRUD operations for `TaskItem` entities (create, retrieve, update, delete).
-* **RESTful API:** Implements standard HTTP methods (GET, POST, PUT, DELETE) for clear and intuitive resource interaction.
-* **Database Integration:** Seamless persistence of task items using Entity Framework Core. Configured by default for SQLite, but easily adaptable to other databases like SQL Server or PostgreSQL.
-* **API Documentation:** Auto-generated interactive API documentation using Swagger/OpenAPI for easy exploration and testing.
-* **Containerization:** Includes Docker support for simplified deployment and consistent development environments.
+- **ASP.NET Core**: A cross-platform, high-performance framework for building modern, cloud-enabled, Internet-connected applications.
+- **C#**: The primary programming language used for backend development.
+- **Entity Framework Core**: An object-relational mapper (ORM) that enables .NET developers to work with a database using .NET objects.
+- **JSON Web Tokens (JWT)**: For secure and stateless user authentication.
+- **SQL Server** (or other relational database): For data storage (typically configured via Entity Framework Core).
 
-## 🚀 Technologies Used
+## Project Structure
 
-* **ASP.NET Core 8.0** (or a recent LTS version) - The powerful web framework for building the API.
-* **C#** - The primary programming language.
-* **Entity Framework Core** - An Object-Relational Mapper (ORM) for data access and database management.
-* **SQLite** - The default lightweight, file-based database for development.
-* **Docker** - For containerizing the application.
-* **Swagger/OpenAPI** - For interactive API documentation.
+```
+├── Controllers
+│   ├── BasicController.cs
+│   └── TaskItemController.cs
+├── Data
+│   └── PomodorDbContext.cs
+├── Migrations
+├── Models
+│   ├── ApplicationUserModel.cs
+│   ├── TaskItemDTO.cs
+│   └── TaskItemModel.cs
+├── Pomodoro.API.csproj
+├── Pomodoro.API.http
+├── Program.cs
+├── Properties
+│   └── launchSettings.json
+├── Repositories
+│   └── TaskItem
+├── Services
+│   ├── ITaskItemService.cs
+│   └── TaskItemService.cs
+├── data
+│   └── pomodoro.db
+├── biome.json
+├── compose.yml
+├── dockerfile
+├── endpoint_tests
+│   ├── TaskItem/
+│   └── User/
+├── LICENSE
+└── Readme.md
+````
 
-## 🏁 Getting Started
-
-These instructions will guide you through setting up and running the Pomodoro.API project on your local machine for development and testing purposes.
+## Setup and Installation
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
+- .NET SDK (LTS version recommended)
+- A database server if you are running it locally and not in docker (e.g., SQL Server, PostgreSQL, SQLite). Ensure connection strings in `appsettings.json` are updated accordingly.
 
-* [.NET SDK 8.0](https://dotnet.microsoft.com/download) (or the version your project targets)
-* [Git](https://git-scm.com/downloads)
-* [Docker Desktop](https://www.docker.com/get-started) (Optional, for running with Docker)
-* [httpie](https://httpie.io/) and [jq](https://stedolan.github.io/jq/) (Required if you plan to use the provided `runAll.sh` test scripts)
+### Backend Installation
 
-### Local Setup
+```bash
+# Clone the repository
+git clone https://github.com/al0cam/Pomodoro.API.git
+cd Pomodoro.API
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/al0cam/Pomodoro.API.git](https://github.com/al0cam/Pomodoro.API.git)
-    cd Pomodoro.API
-    ```
+# Restore dependencies
+dotnet restore
 
-2.  **Restore dependencies:**
-    ```bash
-    dotnet restore
-    ```
+# Apply database migrations
+dotnet ef database update
 
-3.  **Database Configuration and Migrations:**
-    By default, the API is configured to use **SQLite**, which stores its data in a file (`app.db` or similar) within your project's data directory.
+# Apply database migrations from your machine if you are running it locally
+dotnet ef database update --connection "Data Source=./data/pomodoro.db"
 
-    * **Review Connection Strings:** If you wish to use a different database (e.g., SQL Server, PostgreSQL), modify the `ConnectionStrings` section in `appsettings.json` and `appsettings.Development.json`.
-    * **Apply Migrations:** Run Entity Framework Core migrations to create or update your database schema:
-        ```bash
-        dotnet ef database update
-        ```
-        *(If `dotnet ef` command is not found, install the EF Core CLI tools globally: `dotnet tool install --global dotnet-ef`)*
+# If needed, create the initial migration
+dotnet ef migrations add InitialCreate -p Pomodoro.API -s Pomodoro.API
 
-4.  **Run the API:**
-    ```bash
-    dotnet run
-    ```
-    The API should now be running, typically accessible at `https://localhost:5001` (HTTPS) and `http://localhost:5000` (HTTP). Check your console output for the exact URLs.
+# Run the application
+dotnet run
+````
 
-### Docker Setup (Optional)
+The API will typically start on `http://localhost:5000/` or a similar address, as configured in `Properties/launchSettings.json`.
 
-For a containerized environment, you can use Docker:
+## API Endpoints
 
-1.  **Build the Docker image:**
-    ```bash
-    docker build -t pomodoro-api .
-    ```
+### Account Endpoints (`/api/Account`)
 
-2.  **Run the Docker container:**
-    ```bash
-    docker run -p 5000:80 -p 5001:443 pomodoro-api
-    ```
-    The API will be accessible at `http://localhost:5000` (HTTP) and `https://localhost:5001` (HTTPS).
+#### `POST /api/Account/register`
 
-## 💡 API Endpoints
+* **Description**: Registers a new user account.
+* **Request Body**: JSON object with `email`, `password`, and `confirmPassword`.
+* **Response**: Success message or validation errors.
 
-The API provides the following endpoints for managing `TaskItem` resources. You can interact with these endpoints directly or through the integrated **Swagger UI** by navigating to `/swagger` (e.g., `https://localhost:5001/swagger`) in your browser when the API is running.
+#### `POST /api/Account/login`
 
-| Method | Endpoint              | Description                                  | Request Body Example (for `POST`/`PUT`)                        |
-| :----- | :-------------------- | :------------------------------------------- | :------------------------------------------------------------- |
-| `GET`  | `/api/TaskItem`       | Retrieves a list of all available task items. | `N/A`                                                          |
-| `GET`  | `/api/TaskItem/{id}`  | Retrieves a specific task item by its unique ID. | `N/A`                                                          |
-| `POST` | `/api/TaskItem`       | Creates a new task item.                     | `{"title": "New Task Name", "description": "Task details", "estimatedPomodoros": 3}` |
-| `PUT`  | `/api/TaskItem/{id}`  | Updates an existing task item.               | `{"id": 1, "title": "Updated Name", "isCompleted": true, "estimatedPomodoros": 3}` |
-| `DELETE`| `/api/TaskItem/{id}`  | Deletes a task item by its ID.               | `N/A`                                                          |
+* **Description**: Authenticates a user and returns a JWT.
+* **Request Body**: JSON object with `email` and `password`.
+* **Response**: JSON object containing `accessToken`, `tokenType`, `expiresIn`, and `refreshToken`.
 
-*(Note: The exact properties in the request/response bodies will depend on your `TaskItem` model definition.)*
+### Task Item Endpoints (`/api/TaskItem`)
 
-## 🧪 Usage and Testing
+#### `GET /api/TaskItem`
 
-You can interact with the API using command-line tools or the interactive Swagger UI.
+* **Description**: Retrieves all tasks for the authenticated user.
+* **Authentication**: Requires a valid JWT in the `Authorization: Bearer <token>` header.
+* **Response**: Array of task objects.
 
-### Using Swagger UI
+#### `GET /api/TaskItem/{id}`
 
-Once the API is running (either locally with `dotnet run` or via Docker), open your web browser and navigate to:
-`https://localhost:5001/swagger` (or `http://localhost:5000/swagger`)
+* **Description**: Retrieves a specific task by ID for the authenticated user.
+* **Authentication**: Requires a valid JWT.
+* **Response**: A single task object.
 
-From here, you can view the API documentation, send requests, and see responses directly in your browser.
+#### `POST /api/TaskItem`
 
-### Using the Provided Test Scripts (`runAll.sh`)
+* **Description**: Creates a new task for the authenticated user.
+* **Authentication**: Requires a valid JWT.
+* **Request Body**: JSON object containing task details (`title`, `description`, `isCompleted`, `estimatedPomodoros`, `completedPomodoros`).
+* **Response**: The newly created task object including its generated `id` and `createdAt` timestamp.
 
-The repository includes a set of Bash scripts (`post.sh`, `getById.sh`, `put.sh`, `delete.sh`, `getAll.sh`, and `runAll.sh`) to automate a full cycle of API interactions and test the endpoints.
+#### `PUT /api/TaskItem/{id}`
 
-**Prerequisites for scripts:**
-* `httpie` (a user-friendly command-line HTTP client)
-* `jq` (a lightweight and flexible command-line JSON processor)
+* **Description**: Updates an existing task for the authenticated user.
+* **Authentication**: Requires a valid JWT.
+* **Request Body**: JSON object with updated task details (including the `id`).
+* **Response**: No content (`204`) on success.
 
-**To run the automated tests:**
+#### `DELETE /api/TaskItem/{id}`
 
-1.  Ensure the API is running (e.g., in a separate terminal via `dotnet run`).
-2.  Make the test scripts executable:
-    ```bash
-    chmod +x *.sh
-    ```
-3.  Execute the main test suite using Bash:
-    ```bash
-    bash runAll.sh
-    ```
-    This script will perform a sequence of API calls (Create, Get by ID, Update, Delete, Get All) and report the PASS/FAIL status for each operation.
+* **Description**: Deletes a task for the authenticated user.
+* **Authentication**: Requires a valid JWT.
+* **Response**: No content (`204`) on success.
 
-### Example `httpie` Commands
+## Contributing
 
-(Assuming the API is running on `http://localhost:5000`)
+Contributions to the Pomodoro API are welcome. If you have suggestions for new features, improvements, or bug fixes, please open an issue or submit a pull request.
 
-* **Create a TaskItem:**
-    ```bash
-    http POST http://localhost:5000/api/TaskItem Title="Learn ASP.NET Core" Description="Deep dive into Web APIs for backend dev." EstimatedPomodoros:=5
-    ```
+## License
 
-* **Get all TaskItems:**
-    ```bash
-    http GET http://localhost:5000/api/TaskItem
-    ```
-
-* **Get TaskItem by ID (replace `1` with an actual ID from a POST response):**
-    ```bash
-    http GET http://localhost:5000/api/TaskItem/1
-    ```
-
-* **Update a TaskItem (replace `1` with an actual ID, update fields as needed):**
-    ```bash
-    http PUT http://localhost:5000/api/TaskItem/1 Title="Mastered ASP.NET Core" IsCompleted:=true CompletedPomodoros:=5 EstimatedPomodoros:=5
-    ```
-
-* **Delete a TaskItem (replace `1` with an actual ID):**
-    ```bash
-    http DELETE http://localhost:5000/api/TaskItem/1
-    ```
-
-## 🤝 Contributing
-
-Contributions are welcome! If you find a bug, have a suggestion for improvement, or want to add new features, please feel free to:
-
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/your-feature-name`).
-3.  Make your changes.
-4.  Commit your changes (`git commit -m 'feat: Add new awesome feature'`).
-5.  Push to the branch (`git push origin feature/your-feature-name`).
-6.  Open a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgements
-
-* Inspired by the Pomodoro Technique.
-* Built with the robust ASP.NET Core framework.
-* Special thanks to the open-source community for tools like httpie and jq.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
