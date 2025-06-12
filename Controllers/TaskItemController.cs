@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // Ensures only authenticated users can access these endpoints
-public class TaskItemsController : ControllerBase
+[Authorize]
+public class TaskItemController : ControllerBase
 {
     private readonly ITaskItemService _taskItemService;
 
-    public TaskItemsController(ITaskItemService taskItemService)
+    public TaskItemController(ITaskItemService taskItemService)
     {
         _taskItemService = taskItemService;
     }
@@ -16,7 +16,7 @@ public class TaskItemsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskItem>>> GetAllTasks()
     {
-        // Pass the current user to the service
+
         var tasks = await _taskItemService.GetAllAsync(User);
         return Ok(tasks);
     }
@@ -24,11 +24,11 @@ public class TaskItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TaskItem>> GetTaskById(int id)
     {
-        // Pass the current user to the service
+
         var task = await _taskItemService.GetByIdAsync(id, User);
         if (task == null)
         {
-            // This could mean not found or not authorized
+
             return NotFound();
         }
         return Ok(task);
@@ -37,7 +37,7 @@ public class TaskItemsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TaskItem>> AddTask(TaskItemDTO taskDTO)
     {
-        // Pass the current user to the service
+
         var addedTask = await _taskItemService.AddAsync(taskDTO, User);
         return CreatedAtAction(nameof(GetTaskById), new { id = addedTask.Id }, addedTask);
     }
@@ -47,7 +47,7 @@ public class TaskItemsController : ControllerBase
     {
         try
         {
-            // Pass the current user to the service
+
             var updatedTask = await _taskItemService.UpdateAsync(taskDTO, id, User);
             return Ok(updatedTask);
         }
@@ -62,7 +62,6 @@ public class TaskItemsController : ControllerBase
     {
         try
         {
-            // Pass the current user to the service
             await _taskItemService.DeleteAsync(id, User);
             return NoContent();
         }

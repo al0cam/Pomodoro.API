@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-public class PomodorDbContext : IdentityDbContext<ApplicationUser> // Change to ApplicationUser
+public class PomodorDbContext : IdentityDbContext<ApplicationUser>
 {
     public required DbSet<TaskItem> TaskItems { get; set; }
 

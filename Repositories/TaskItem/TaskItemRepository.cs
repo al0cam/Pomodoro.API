@@ -18,15 +18,11 @@ public class TaskItemRepository : ITaskItemRepository
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync()
     {
-        // This method might not be needed anymore if all gets are user-specific,
-        // or you might use it for admin roles. Consider its purpose.
         return await _context.TaskItems.ToListAsync();
     }
 
     public async Task<TaskItem?> GetByIdAsync(int id)
     {
-        // Note: The service layer (TaskItemService) is responsible for
-        // checking if the task belongs to the user. The repository just fetches by ID.
         return await _context.TaskItems.FindAsync(id);
     }
 
