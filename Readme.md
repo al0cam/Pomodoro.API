@@ -19,7 +19,9 @@ This repository contains the backend API for the Pomodoro application, designed 
 - **C#**: The primary programming language used for backend development.
 - **Entity Framework Core**: An object-relational mapper (ORM) that enables .NET developers to work with a database using .NET objects.
 - **JSON Web Tokens (JWT)**: For secure and stateless user authentication.
-- **SQL Server** (or other relational database): For data storage (typically configured via Entity Framework Core).
+- **SQLite** (or other relational database): For data storage (typically configured via Entity Framework Core).
+- **Docker**: For containerization, allowing easy deployment and scaling of the application.
+- **MediatR**: For implementing the CQRS (Command Query Responsibility Segregation) pattern, separating read and write operations for better scalability and maintainability.
 
 ## Project Structure
 
@@ -27,31 +29,32 @@ This repository contains the backend API for the Pomodoro application, designed 
 ├── Controllers
 │   ├── BasicController.cs
 │   └── TaskItemController.cs
-├── Data
-│   └── PomodorDbContext.cs
-├── Migrations
+├── Repositories
+│   └── TaskItem
+├── Features
+│   └── TaskItems
+│       ├── Commands
+│       └── Queries
 ├── Models
 │   ├── ApplicationUserModel.cs
 │   ├── TaskItemDTO.cs
 │   └── TaskItemModel.cs
-├── Pomodoro.API.csproj
-├── Pomodoro.API.http
-├── Program.cs
+├── Migrations
 ├── Properties
 │   └── launchSettings.json
-├── Repositories
-│   └── TaskItem
-├── Services
-│   ├── ITaskItemService.cs
-│   └── TaskItemService.cs
+├── Data
+│   └── PomodorDbContext.cs
 ├── data
 │   └── pomodoro.db
-├── biome.json
-├── compose.yml
-├── dockerfile
 ├── endpoint_tests
 │   ├── TaskItem/
 │   └── User/
+├── Pomodoro.API.csproj
+├── Pomodoro.API.http
+├── Program.cs
+├── biome.json
+├── compose.yml
+├── dockerfile
 ├── LICENSE
 └── Readme.md
 ````
