@@ -33,8 +33,9 @@ builder.Services.AddDbContext<PomodorDbContext>(options =>
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<PomodorDbContext>();
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
 builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
-builder.Services.AddScoped<ITaskItemService, TaskItemService>();
 
 builder.Services.AddControllers();
 
